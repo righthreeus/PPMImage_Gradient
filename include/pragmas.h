@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(_MSVC_VER)
+#if defined(_MSC_VER)
     #define DISABLE_WARING_PUSH      __pragma(warning(push))
     #define DISABLE_WARING_POP       __pragma(warning(pop))
     #define DISABLE_WARNING(number)  __pragma(warning(number))
