@@ -3,19 +3,37 @@
 #ifndef _VECTOR3_HPP_
 #define _VECTOR3_HPP_
 
-#include <cmath>
 #include "pragmas.h"
+#include <cmath>
+#include <type_traits>
 
 template <typename T>
 struct Vector3 {
-    Vector3()
-        :x(0.0f), y(0.0), z(0.0) {}
 
-    Vector3(T value)
-        :x(value), y(value), z(value) {}
+    using floating_type = typename std::common_type<float, T>::type;
+
+    Vector3()
+        :x{ static_cast<T>(0) },
+         y{ static_cast<T>(0) },
+         z{ static_cast<T>(0) } {}
+
+    explicit Vector3(T value)
+        :x{ value }, y{ value }, z{ value } {}
 
     Vector3(T _x, T _y, T _z)
-        :x(_x), y(_y), z(_z) {}
+        :x{ _x }, y{ _y }, z{ _z } {}
+
+DISABLE_WARING_PUSH
+DISABLE_NARROWING
+    template <typename U>
+    operator Vector3<U>() const {
+        return Vector3<U> {
+            static_cast<U>(x),
+            static_cast<U>(y),
+            static_cast<U>(z)
+        };
+    }
+DISABLE_WARING_POP
 
     inline bool operator==(Vector3 const& v) const {
         return (x == v.x) && (y == v.y) && (z == v.z);
@@ -37,11 +55,11 @@ struct Vector3 {
         return Vector3(x - v.x, y - v.y, z - v.z);
     }
 
-    inline Vector3 operator*(float s) const {
+    inline Vector3 operator*(floating_type s) const {
         return Vector3(x * s, y * s, z * s);
     }
 
-    inline Vector3 operator/(float s) const {
+    inline Vector3 operator/(floating_type s) const {
         return Vector3(x / s, y / s, z / s);
     }
 
@@ -55,40 +73,30 @@ struct Vector3 {
         return *this;
     }
 
-    Vector3& operator*=(float s) {
+    Vector3& operator*=(floating_type s) {
         *this = *this * s;
         return *this;
     }
 
-    Vector3& operator/=(float s) {
+    Vector3& operator/=(floating_type s) {
         *this = *this / s;
         return *this;
     }
 
     Vector3 nomalized() const {
-        float mag = this->mag();
-        return vec3(x / mag, y / mag, z / mag);
+        auto c = Vector3<floating_type>(*this);
+        c /= mag();
+        return Vector3<T>(c);
     }
 
-    inline float mag() const {
-        return std::sqrt(x * x + y * y + z * z);
-    }
-
-    inline float sqr_mag() const { 
+    inline T sqr_mag() const { 
         return (x * x + y * y + z * z);
     }
 
-DISABLE_WARING_PUSH
-DISABLE_NARROWING
-    template <typename U>
-    operator Vector3<U>() const {
-        return Vector3<U> {
-            static_cast<U>(x),
-            static_cast<U>(y),
-            static_cast<U>(z)
-        };
+    inline floating_type mag() const {
+        auto c = Vector3<floating_type>(*this);
+        return std::sqrt(c.x * c.x + c.y * c.y + c.z * c.z);
     }
-DISABLE_WARING_POP
 
     static const Vector3 Zero;
     static const Vector3 One;
@@ -105,17 +113,17 @@ DISABLE_WARING_POP
 };
 
 template <typename T>
-inline Vector3<T> operator*(float s, Vector3<T> const& v) {
+inline Vector3<T> operator*(typename Vector3<T>::floating_type s, Vector3<T> const& v) {
     return v * s;
 }
 
 template <typename T>
-inline Vector3<T> operator/(float s, Vector3<T> const& v) {
+inline Vector3<T> operator/(typename Vector3<T>::floating_type s, Vector3<T> const& v) {
     return v / s;
 }
 
 template <typename T>
-inline float dot(Vector3<T> const& a, Vector3<T> const& b) {
+inline typename Vector3<T>::floating_type dot(Vector3<T> const& a, Vector3<T> const& b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
@@ -181,7 +189,10 @@ const Vector3<T> Vector3<T>::Back =
         static_cast<T>(-1)
     };
 
-using Vec3  = Vector3<float>;
+using  Vec3 = Vector3<float>;
+using DVec3 = Vector3<double>;
 using IVec3 = Vector3<int>;
+using UVec3 = Vector3<size_t>;
+using BVec3 = Vector3<bool>;
 
 #endif // _VECTOR3_HPP_

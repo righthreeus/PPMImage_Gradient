@@ -29,6 +29,8 @@ struct Rectangle {
 };
 
 using  Rect = Rectangle<float>;
+using DRect = Rectangle<double>;
 using IRect = Rectangle<int>;
+using URect = Rectangle<size_t>;
 
 #endif

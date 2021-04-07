@@ -4,7 +4,6 @@
 #include "graphics/Color.h"
 #include "graphics/images/PPMImage.h"
 
-
 int main() {
     constexpr float aspect_ratio = 16.0f / 9.0f;
     constexpr int H = 512;
@@ -24,7 +23,16 @@ int main() {
 
     // img.write_2_colors_linear_gradient(Color::Red, Color::Green, img.rect(), Direction::Horizontal);
 
+    auto c = Vec3(1.0f);
+    c.mag();
+    c.sqr_mag();
+    c.nomalized();
+
     img.write_4_corners_linear_gradient(Color::Blue, Color::Yellow, Color::Yellow, Color::Blue, img.rect());
+
+    for (int x = 100; x < 200; ++x)
+        for (int y = 100; y < 200; ++y)
+            img[x][y] = Color::Red;
 
     img.flush(std::cout);
 }
